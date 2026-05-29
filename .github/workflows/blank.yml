@@ -1,0 +1,43 @@
+name: Download File And Attach To Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      file_url:
+        description: "Public file URL"
+        required: true
+      release_tag:
+        description: "Existing release tag"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  upload-to-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download file
+        run: |
+          mkdir -p artifacts
+
+          FILE_NAME=$(basename "https://gemini.google.com/share/d8d0dc64f45d")
+
+          curl -L \
+            --fail \
+            --output "artifacts/$FILE_NAME" \
+            "${{ github.event.inputs.file_url }}"
+
+          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
+
+      - name: Upload file to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.release_tag }}
+          files: artifacts/${{ env.FILE_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
