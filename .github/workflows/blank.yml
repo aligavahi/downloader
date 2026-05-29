@@ -25,7 +25,7 @@ jobs:
         run: |
           mkdir -p artifacts
 
-          FILE_NAME=$(basename "https://gemini.google.com/share/d8d0dc64f45d")
+          FILE_NAME=$(basename "${{ github.event.inputs.file_url }}")
 
           curl -L \
             --fail \
